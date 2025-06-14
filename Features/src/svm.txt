@@ -1,0 +1,2 @@
+Para el uso de Support Vector Machine, se extraen los de daots de la misma forma que RandomForest
+Sin embargo, antes de realizar el modelo, se concatenan las caracteristicas de entrenamiento y validación, a su vez que las etiquetas. Se realiza el proceso de analisis de caracteristicas principales PCA. Esta técnica permite reducir la dimensionalidad del problema. Si en un principio se tiene 
