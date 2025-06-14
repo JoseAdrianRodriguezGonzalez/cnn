@@ -1,0 +1,20 @@
+Modelo, random forest
+
+Para el modelo del random forest, primeramente se extrajeron los datos dentro de los archivos con features,teniendo divido el conjunto de datos en entrenamiento y validación, y para cada subconjunto de datos, tiene de entrada las características y de salida las etiquetas de las clases.
+
+Para encontrar el mejor model de random forest, se utilizar un GridSearch, con los siguientes parámetros de prueba
+Número de estimadores: 100,200,300
+Máxima profundidad: 10,20,30
+Peso de la clase: balanceado o ninguno.
+Esta malla, se basará en los datos de entrenamiento y los dividirá en tres. Encontró que los mejores parámetros para el modelo es 
+Número de estimadores: 100,200,300
+Máxima profundidad: 30 
+Peso de la clase: Ninguno
+número de estimadores:300
+Con un accuracy de 0.176
+Para la sección del entrenamiento. Cuando se evalúa el árbol con estos parámetros con el subconjunto de datos de validación, se obtiene un accuracy de 0.19
+
+Random forest posee una cantidad de arboles de decisiones,(estimadores), que eligen en base a un conjunto de datos
+Cada árbol se entrena con un subconjunto de datos y se escoge un subconjunto de características aleatorios para decidir al evaluación.
+La profundidad indica que tantas características aleatorias se escogen.
+

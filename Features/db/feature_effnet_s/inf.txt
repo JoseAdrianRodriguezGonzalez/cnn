@@ -1,0 +1,5 @@
+[INFO] Guardadas características en train_features.npy y etiquetas en train_labels.npy
+[INFO] Características shape: (40493, 1280), etiquetas shape: (40493,)
+[INFO] Extrayendo características del set de validación...
+[INFO] Guardadas características en val_features.npy y etiquetas en val_labels.npy
+[INFO] Características shape: (10123, 1280), etiquetas shape: (10123,)
