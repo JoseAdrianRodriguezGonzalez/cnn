@@ -5,7 +5,6 @@ train_labels=np.load('../db/feature_effnet_s/train_labels.npy') #Values between 
 val_features=np.load('../db/feature_effnet_s/val_features.npy') #10123 x 1200 
 val_labels=np.load('../db/feature_effnet_s/val_labels.npy') #Values between 0 to 11 10123 x1 
 print(val_labels.shape) 
-<<<<<<< HEAD
 #In a moment I will train them
 
 
