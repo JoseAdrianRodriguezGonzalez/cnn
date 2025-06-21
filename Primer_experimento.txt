@@ -1,0 +1,23 @@
+Para el primer experimento se intento un modelo, se utilizó un modelo de convolucional basado en ResNET9 con bloques residuales.
+La estructura, está dad por un bloque convolucional y un clasificador final
+Para el bloque convolucional:
+
+conv1, posee 64 canales
+conv2, posee 64 -> 128 canales +maxpool
+res1, 2 bloques residuales (128->128)
+conv3:128->256 maxpool
+conv4:256->512+maxpool
+res2: 2 bloques residulaes (512->512)
+
+Para el clasificador final:
+
+AdaptativeAvgPool2d(1) para aplanar espacialmente a tamaño 1x1
+Flatten->Dropout(0.2) ->Linear(512->um_classes)
+
+Para este modelo, se le probó con distintos conjuntos de datos de imágenes.
+
+1.- Conjunto de datos 1
+2.- Conjunto de datos con rotaciones
+3.- Conjunto de datos con rotaciones y centrado.
+
+
