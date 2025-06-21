@@ -1,0 +1,17 @@
+Para el segundo experimento, se desarrolla una arquitectura de red Convolucional, entrenandola con el conjunto de datos de fotos rotadas.
+La arquitectura se compone por:
+
+Input(1 canal, tamaño variable)
+Conv2D(1->128, kernel=5,stride=2)+ ReLU
+Conv2D(128->128,kernel=5,stride=2)+ReLU+MaxPool2D
+ResidualBlock:
+    Conv2D(128->128)+ReLU
+    Conv2D(128->128)+ReLU
+    Conv2D(1x1)
+    Suma con la entrada
+AdaptativeAvgPool2D-->Flatten
+Linear(128->256)->Sigmoide
+Linear(256->12)->softmax
+Output->Predicción de la clase.
+
+Los resultados obtenidos superaron al experimento anterior, proporcionando accuracies mayores a 0.25 y como punto máximo el 0.33

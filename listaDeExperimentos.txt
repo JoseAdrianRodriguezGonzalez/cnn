@@ -1,0 +1,5 @@
+Experimentos
+1.-Entrenar la CNN y probar las distintas resoluciones y vercual daba mejor resultado,(Código utilizado en el cnn_test)
+2.-Utilizar una arquitectura custom
+3.-probar con modelo clásico, Random Foreest, XGBoost con unos cuantos features
+4.-Probar modelo clásico con más features de EfficientNET

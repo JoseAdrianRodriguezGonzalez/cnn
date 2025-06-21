@@ -1,0 +1,24 @@
+El tercer experimento consistió en encontrar modelos clásicos que pudieran ayudar a mejorar la clasificación.
+En este caso, se implementaron los modelos Random Forest,XGBoost y SVG.
+Se analizó el conjunto de datos y se encontró la característica de presentar una distribución exponencial.  Después se prueba con un random forest base, con todas las características. Fue un random forest de 100 estimadores y 10 de profundidad siendo un árbol balanceado. 
+Adicionalmente, se probó con una cierta cantidad de características principales, tomando solo 500.
+
+Sin embargo, la elección de 500 elementos, se baso enteramente por el orden, por lo que se empleó la técnica de PCA, que consiste en transformar un conjunto de variables posiblemente correlacionadas en un conjunto más pequeños de variables no correlacionadas llamadas componentes principales. Estos componentes principales son combinaciones lineales de las variables originales de tal manera que el primer componente capture la mayor cantidad posible de varianza, el segundo, la segunda mayor y de manera sucesiva con el conjunto de elementos.
+
+
+Se entrena una random forest con 100 estimadores y profundidad de 10, pero con estos nuevos elementos del PCA.
+
+Además, se visualiza la cercanía de de clases por medio del t-SNE, es un método estadístico que permite la visualización de datos de muchas dimensiones y se les asigna un punto dentro de un gráfico de 2 o 3 tres dimensiones. En este mapa se observó que las clases están demasiado juntas y que no existe un punto de separación observable.
+
+Se probó con un xgboost su optimización de hiperpárametros con los siguientes parámetros.
+Sin embargo, el entrenamiento demoró un largo tiempo a pesar de haber sido entrenado con CUDA.
+param_dist = {
+    "n_estimators": [100, 200, 300],
+    "max_depth": [3, 5, 7, 10],
+    "learning_rate": [0.01, 0.05, 0.1, 0.2],
+    "subsample": [0.6, 0.8, 1.0],
+    "colsample_bytree": [0.6, 0.8, 1.0],
+    "gamma": [0, 0.1, 0.3, 0.5],
+    "reg_alpha": [0, 0.01, 0.1],
+    "reg_lambda": [1, 1.5, 2.0]
+}
