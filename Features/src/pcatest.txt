@@ -1,0 +1,17 @@
+En este experimentos se retoma lo previamente visualizado al entrenar SVM y fue demostrar si la relación encontrada en t-sne, indicaba una característica potencial oculta
+
+Para esto se busca primero cual es la cantidad minima aceptable en el que PCA puede remover variables y tomar las mas significativas. Por medio de varianza acumulada, si la cantidad de variables poseen una varianza mayor o igual al 90, implica que es un cantidad aceptable de variables, se puede determinar que la cantidad minima es de 60 variables, de aquí en adelante se puede tomar estas variables para calcular el t-sne.
+Los parámetros que se pasaron a T-SNE fueron, 2 componentes, 30 de perplexity, fijar a 42 la semilla aleatoria, con pca, y tasa de aprendiza auto.
+Se gráfica y se le puede aplicar kmeans en base a tsne, para poder observar cuantos y cuales clusteres puede originar el algoritmo. Kmeans utiliza los paramentros de 2 clusteres principales y una semilla de 42. Kmeans genera grupos de datos esféricos, similares en tamaño y en distancia y se deben, a su que se le deben de pasar una cantidad k de clústeres antes de ejecutar. El proceso consiste en :
+
+Inicializa k centroides al azar.
+Asigna cada punto al centroide más cercano (medida: distancia euclidiana).
+Recalcula los centroides como el promedio de los puntos asignados.
+Repite hasta convergencia.
+
+El algoritmo HDBSCAN es del tipo clustering jerárquico y se basa en densidades
+Se hacen las suposiciones en que los clústeres tienen formas arbitrarias y d diferente densidad, además de que no se necesita definir un K.
+En resumen, calcula la densidad local, es decir que tantos puntos cercanos hay entre sí , construye un árbol jerárquico de densidades  y extrae los clústeres más estables del árbol, aquellos puntos que son poco densos, se les denominan como Outliers y tienen un valor de -1.
+Estos experimentos se repitieron para analizar la conversión de UMAP, es deicr utilizando kmeans y hdbscan.
+Aquí se visualiza que hdbscan encontró varios conjuntos de clusteres(190), y se visualizan.
+

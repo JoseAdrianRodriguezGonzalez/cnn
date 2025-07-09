@@ -36,19 +36,19 @@ model.compile(
 )
 
 # 4. Early Stopping
-early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
 # 5. Entrenamiento
 history = model.fit(
-    X_train_scaled,
+    train_features,
     train_labels,
     epochs=50,
     batch_size=128,
-    validation_data=(X_val_scaled, val_labels),
-    callbacks=[early_stop],
+    validation_data=(val_features, val_labels),
     verbose=1
 )
 
 # 6. Evaluación
-val_loss, val_acc = model.evaluate(X_val_scaled, val_labels, verbose=0)
+val_loss, val_acc = model.evaluate(val_features, val_labels, verbose=0)
 print(f"\nAccuracy en validación: {val_acc:.4f}")
+# sin normalizar Accuracy en validación: 0.2132
+#Accuracy en validación: 0.2514
