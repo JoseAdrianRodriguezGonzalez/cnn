@@ -1,0 +1,17 @@
+Para este experimento se realiza un entrenamiento con redes neuroanles, se utiliza tensorflow con keras. Primeramente se normalizan los datos.
+La arquitectura del modelo esta dada por una red densa de 512 neuronas, con activación relu y una entrada de 1280 neuronas, con un dropout del 30%
+256 neuronas y con activación relu, dropout del 20% y en la salida 12 redes con activación softmax.
+El método de compilación es con el optimizador adam, la perdida, está dado por entropía cruzada y la métrica es accuracy
+El modelo se entrena con las caracterisitcas de entrenamiento y categorias de entrenamiento, 50 epocas, 128 de tamaño del batch, y los datos de validación se le insertan. 
+Se calcula la validacionfinal (ultima validación) y obtiene el resultado
+Se probó esta arquitectura normalizando los datos y sin normalizar. 
+Con los datos normalizaados arrojo 0.2514 de accuracy, mientras que los no normalizados dio 0.2132
+
+Hasta ahora, y recopilando los anteriores experimentos, se probaron los siguientes modelos con su respectivo mejor accuracy
+
+SVM=0.20
+Random forest=0.19
+Knn=0.14
+MLP=0.25
+
+Esto muestra que los mejores modelos que han resultado han sido Random forest, SVM y MLP, sin embargo siguen teniendo accuracies muy pequeños 

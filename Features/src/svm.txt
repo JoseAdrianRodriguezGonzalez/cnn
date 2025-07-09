@@ -1,2 +1,25 @@
-Para el uso de Support Vector Machine, se extraen los de daots de la misma forma que RandomForest
-Sin embargo, antes de realizar el modelo, se concatenan las caracteristicas de entrenamiento y validación, a su vez que las etiquetas. Se realiza el proceso de analisis de caracteristicas principales PCA. Esta técnica permite reducir la dimensionalidad del problema. Si en un principio se tiene 
+Primeramente se realizo un experimento con SVM, generando el siguiente pipeline
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('pca', PCA(n_components=60)),
+    ('svm', OneVsRestClassifier(SVC(kernel='rbf', C=1, gamma='scale')))
+])
+Después la siguiente malla de Hiperparámetros
+param_grid = {
+    'svm__estimator__C': loguniform(0.1, 100),
+    'svm__estimator__gamma': loguniform(1e-4, 1e-1),
+    'pca__n_components': [60],
+}
+Se utilizo un RandomizedSearchCV, para poder encontrar los mejores Hiperparámetros según el pipeline y la malla. El proceso fue paralelizado por n_jobs=-1y se dividio con un cv de 5. En el entrenamiento se extrajeron 10000 datos y arrojó 
+{'pca__n_components': 60, 'svm__estimator__C': np.float64(31.428808908401084), 'svm__estimator__gamma': np.float64(0.0004335281794951569)}
+##Mejor score: 0.1373
+Se tuvieron que realizar otras técnicas descritas posteriormente 
+Para el uso de Support Vector Machine, se extraen los de datos de la misma forma que RandomForest
+Sin embargo, antes de realizar el modelo, se concatenan las características de entrenamiento y validación, a su vez que las etiquetas. Se realiza el proceso de análisis de características principales PCA. Esta técnica permite reducir la dimensionalidad del problema. Si en un principio se tiene 1240 variables, se pueden reducir a tan solo 100.
+
+Primero se extraen los feautures y se concatena dos arreglos del tipo Numpy. Se reduce la dimensionalidad de PCA en X a 100 variables, a su vez, que esta transformación se le pasa a T-SNE. T-SNE es un método estadístico que permite visualizar datos en alta dimensionalidad mapeando cada dato en un punto dentro de una región en dos o tres dimensiones, funciona convirtiendo similaridades entre puntos de datos hacia la unión de probabilidades y apunta a minimizar la divergencia de Kullback-Leibler entre las uniones de probabilidad  de baja y alta dimensionalidad.
+Se define una función que permite generar las gráficas. Se gráfica el resultado e t-sne. La primera gráfica, realiza la división entre datos de validación y entrenamiento.
+La segunda definición la realiza en base a cada una de las clases.
+Ambas muestran una gráfica de puntos, mostrando que existe una característica que separa la región de los datos, sin embargo, estos dos conjuntos o agrupaciones, poseen las clases combinadas, necesita ser sometida a otras pruebas.
+
+Después se prueba el PCA cn 100 componentes arrojando un accuracy de 0.20

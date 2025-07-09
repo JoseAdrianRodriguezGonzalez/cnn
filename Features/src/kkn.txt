@@ -1,0 +1,15 @@
+Se hizo una prueba con un modelo clásico, Knn.
+Primero se escalaron los datos, después se realizo una reducción de 100 componentes con PCA.
+Con estos datos, se va a entrenar un primer model Knn con 5 vecinos y la métrica Euclideana.
+El Accuracy inicial es de 0.1312
+
+Se utiliza un GridSearcCV para buscar cual es el mejor parámetro
+param_grid = {
+    'n_neighbors': [3, 5, 7, 10, 15, 20],
+    'metric': ['euclidean', 'manhattan', 'cosine'],
+}
+Se le entren con un cross validation de 5, se paraleliza con n_jobs=-1 y se encuentra que 
+Mejores parámetros: {'metric': 'manhattan', 'n_neighbors': 7}
+Mejor accuracy (validación cruzada): 0.13469002740871783
+Accuracy en val: 0.14086733181863084
+El primer accuracy corresponde al entrenamiento y el segundo en validación.

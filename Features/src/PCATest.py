@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn.cluster import KMeans
+import hdbscan
 import umap
 
 # Cargar datos
@@ -15,7 +17,7 @@ val_labels = np.load('../db/feature_effnet_s/val_labels.npy')          # (10123,
 
 X = np.vstack([train_features, val_features])
 y = np.concatenate([train_labels, val_labels])
-
+###PCA 60 COMPONENTES
 pca = PCA(n_components=60)
 X_pca = pca.fit_transform(X)
 
@@ -32,6 +34,36 @@ plt.grid()
 plt.tight_layout()
 plt.show()
 
+#APLCIAR KMEANS PARA VIOSULAIZAR LOS CLUSTERES
+kmeans=KMeans(n_clusters=12,random_state=42)
+clusters=kmeans.fit_predict(X_tsne)
+plt.figure(figsize=(10, 8))
+plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=clusters, cmap='tab10', s=2, alpha=0.7)
+plt.title('Clusters con K-Means sobre t-sne')
+plt.grid()
+plt.show()
+#Utilizar hdbscan como alterntaiva
+
+clusterer = hdbscan.HDBSCAN(min_cluster_size=50, min_samples=10, metric='euclidean')
+labels_hdb = clusterer.fit_predict(X_tsne)
+
+# Número de clusters (excluyendo outliers etiquetados como -1)
+n_clusters = len(set(labels_hdb)) - (1 if -1 in labels_hdb else 0)
+print(f"Clusters encontrados (sin contar outliers): {n_clusters}")
+
+# Visualización
+plt.figure(figsize=(10, 8))
+palette = sns.color_palette('tab20', n_colors=len(set(labels_hdb)))
+colors = [palette[label] if label >= 0 else (0.5, 0.5, 0.5) for label in labels_hdb]
+
+plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=colors, s=5, alpha=0.7)
+plt.title(f'HDBSCAN sobre UMAP - {n_clusters} clusters')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+
 
 ###########################################
 #umap
@@ -47,8 +79,36 @@ plt.title('UMAP sobre PCA (60 comp.)')
 plt.grid(True)
 plt.show()
 
+#Utilizar kmeans 
 
+kmeans=KMeans(n_clusters=2,random_state=42)
+clusters=kmeans.fit_predict(X_umap)
+plt.figure(figsize=(10, 8))
+plt.scatter(X_umap[:, 0], X_umap[:, 1], c=clusters, cmap='tab10', s=2, alpha=0.7)
+plt.title('Clusters con K-Means sobre t-sne')
+plt.grid()
+plt.show()
 
+####Utilizar hdbscan para umap
+clusterer = hdbscan.HDBSCAN(min_cluster_size=50, min_samples=10, metric='euclidean')
+labels_hdb = clusterer.fit_predict(X_umap)
+
+# Número de clusters (excluyendo outliers etiquetados como -1)
+n_clusters = len(set(labels_hdb)) - (1 if -1 in labels_hdb else 0)
+print(f"Clusters encontrados (sin contar outliers): {n_clusters}")
+
+# Visualización
+plt.figure(figsize=(10, 8))
+palette = sns.color_palette('tab20', n_colors=len(set(labels_hdb)))
+colors = [palette[label] if label >= 0 else (0.5, 0.5, 0.5) for label in labels_hdb]
+
+plt.scatter(X_umap[:, 0], X_umap[:, 1], c=colors, s=5, alpha=0.7)
+plt.title(f'HDBSCAN sobre UMAP - {n_clusters} clusters')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+ # Clases en el gran cluster
 
 #########################################
 ####Encontrar la cantidad minima de componente wque superen el 90%
@@ -86,6 +146,5 @@ plt.title('Separación entre train y val con t-SNE sobre PCA (60 comp.)')
 plt.grid(True)
 plt.show()
 #####################################################
-
 
 
