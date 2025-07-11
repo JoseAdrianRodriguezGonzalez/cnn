@@ -1,0 +1,121 @@
+En estos experimentos, se va a seguir un camino de hipótesis que se genero cuando se realizo el análisis exploratorio.
+La propuesta consiste en los siguientes pasos.
+Se han estado entrenando modelos con una entrada X,que consiste de 1200 variables y un salida Y, que consiste de 12 clases. Estas clases están definidas por el ángulo de toma de foto por el robot, sin embargo, los modelos que se han probado no logran discernir una diferencia entre clases. Por el experimento realizado con la visualización de los datos por t-sne y UMAP, se encontró que existen diferencias potenciales entre algunos sectores de datos. T-SNE comprobó que entre datos, habían muy pocas diferencias, mientras que UMAP, que la separación la realiza de forma más agresiva, encuentras las características potenciales con mayor información.
+Entonces, a manera de poder encontrar y corroborar si entre los datos locales,(secciones de datos), existen diferencias entre sí, Para esto se realizó el experimento número 1, que consistió en explorar por medio de HDBSCAN, un técnica de aprendizaje no supervisado que tiene la ventaja con respecto a Kmeans de detectar Outliers y a su vez, no necesita una cantidad definida de clústeres para definir. En este experimento encontró 190 clústeres. Después se realizó un aprendizaje semi-supervisado, ya que,se determino la clase más frecuente dentro de ellos y así generar pseudo-etiquetas, así como también eliminando los outliers; con estas pseudo-etiquetas se entrena un random forest. Se evaluó con distintas métricas como precision, recall f1-score, pero en todas se obtenía un bajo rendimiento, y de accuracy era únicamente del 0.09.
+
+Con este experimento se descarta por completamente el uso de las clases definidas previamente, a su vez que T-SNE no está encontrado características prominentes que puedan ayudarle al modelo a inferir. HDBSCAN encontró demasiados clústeres, por lo que a pesar de que random forest es eficiente a problemas no lineales, se puede sobre ajustar en este tipo casos.
+
+Así que el experimento se construye de la siguiente forma
+
+Entrada de datos-->Reducción de dimensionalidad por PCA--Búsqueda de clústeres por HDBSCAN-->Mapeo de clústeres y filtrado-->escalamiento de datos y preprocesamiento --> Modelo supervisado-->Evaluación
+
+Sin embargo, se probó con el mejor modelo que se había utilizado junto a su arquitectura, es decir la red neuronal,(ya que obtuvo un accuracy de 0.25), sin embargo, siguiendo la misma estructura, el modelo se estaba sobre ajustando ya que siempre comenzaba con un accuracy de 0.99 a 1.00, y evaluándolo con las otras métricas, tendía a realizar un sobre ajuste
+
+Por lo que, el último experimento se realizó en base a la siguiente arquitectura
+
+Entrada de datos-->Reducción de dimensionalidad y búsqueda de topologías de datos latentes--> Clusterización por Kmeans ->Mapeo de Clusteres a mapas-->preprocesamiento-->Clasificador MLP-->Evaluación
+
+La entrada datos es del mismo conjunto previamente revisado y que e ha comparado con todos los modelos descritos, 
+La reducción de dimensionalidad, por medio de UMAP captura estructuras de alta dimensionalidad en un espacio más compacto, buscando regiones del espacio que conserven separabilidad, en los datos de X, entrenamiento y validación
+Se clusterizan por medio de Kmeans por los datos reducidos en umap de X entrenamiento, de esta manera se entrena el modelo de Kmeans, 
+El mapeo de clústeres se realiza como una técnica similar a los anteriores experimentos, en la que busca la clase más frecuente  y genera una etiqueta clusterizada para el entrenamiento y finalmente se hace un remapeo para garantizar que las etiquetes estén dentro de n_classes-1, esto para que sea compatible con las funciones softmax y la evaluación de cross entropy sparse_categorical_crossentropy
+
+Se realiza el procesamiento con escalamiento y división del conjunto de entrenamiento en una relación 80/20
+Se realiza la clasificación por medio del siguiente modelo
+Dense(256, relu, L2)
+Dropout(0.5)
+Dense(128, relu, L2)
+Dropout(0.3)
+Dense(n_classes, softmax)
+Utiliza el optimizador Adam perdida sparse_categorical_crossentropy y la métrica de accuracy, en el entrenamiento se le hace un early stopping, val_loss y batch_size=128 máximo a  50 épocas
+La evaluación por medio  de model.evaluate contra y_val_clustered, de esta manera se corrobora si la red neuronal está aprendiendo con estas nuevas etiquetas de forma correcta. 
+
+El modelo evolucionó y obtuvo lo siguiente:
+
+Epoch 1/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 2s 4ms/step - accuracy: 0.6587 - loss: 2.7148 - val_accuracy: 0.8526 - val_loss: 0.8123
+Epoch 2/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 3ms/step - accuracy: 0.8245 - loss: 0.7798 - val_accuracy: 0.8616 - val_loss: 0.5562
+Epoch 3/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 3ms/step - accuracy: 0.8473 - loss: 0.5945 - val_accuracy: 0.8788 - val_loss: 0.4961
+Epoch 4/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 3ms/step - accuracy: 0.8633 - loss: 0.5416 - val_accuracy: 0.8870 - val_loss: 0.4635
+Epoch 5/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8714 - loss: 0.5090 - val_accuracy: 0.9116 - val_loss: 0.4268
+Epoch 6/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8817 - loss: 0.4848 - val_accuracy: 0.9252 - val_loss: 0.3968
+Epoch 7/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8838 - loss: 0.4700 - val_accuracy: 0.9011 - val_loss: 0.4099
+Epoch 8/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8876 - loss: 0.4607 - val_accuracy: 0.9286 - val_loss: 0.3813
+Epoch 9/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8887 - loss: 0.4518 - val_accuracy: 0.9257 - val_loss: 0.3706
+Epoch 10/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8933 - loss: 0.4398 - val_accuracy: 0.9336 - val_loss: 0.3528
+Epoch 11/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8975 - loss: 0.4275 - val_accuracy: 0.9405 - val_loss: 0.3415
+Epoch 12/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9040 - loss: 0.4135 - val_accuracy: 0.9376 - val_loss: 0.3409
+Epoch 13/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9022 - loss: 0.4054 - val_accuracy: 0.9389 - val_loss: 0.3395
+Epoch 14/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8996 - loss: 0.4075 - val_accuracy: 0.9313 - val_loss: 0.3416
+Epoch 15/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8987 - loss: 0.4090 - val_accuracy: 0.9412 - val_loss: 0.3256
+Epoch 16/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.8985 - loss: 0.4194 - val_accuracy: 0.9338 - val_loss: 0.3290
+Epoch 17/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9013 - loss: 0.3968 - val_accuracy: 0.9291 - val_loss: 0.3243
+Epoch 18/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9070 - loss: 0.3842 - val_accuracy: 0.9486 - val_loss: 0.3057
+Epoch 19/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9031 - loss: 0.3992 - val_accuracy: 0.9476 - val_loss: 0.3024
+Epoch 20/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9108 - loss: 0.3755 - val_accuracy: 0.9469 - val_loss: 0.2983
+Epoch 21/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9088 - loss: 0.3769 - val_accuracy: 0.9432 - val_loss: 0.3094
+Epoch 22/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9092 - loss: 0.3766 - val_accuracy: 0.9455 - val_loss: 0.2997
+Epoch 23/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9097 - loss: 0.3685 - val_accuracy: 0.9496 - val_loss: 0.2889
+Epoch 24/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9096 - loss: 0.3725 - val_accuracy: 0.9459 - val_loss: 0.2905
+Epoch 25/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9153 - loss: 0.3562 - val_accuracy: 0.9400 - val_loss: 0.2947
+Epoch 26/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9017 - loss: 0.3882 - val_accuracy: 0.9416 - val_loss: 0.3129
+Epoch 27/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9028 - loss: 0.3971 - val_accuracy: 0.9375 - val_loss: 0.3091
+Epoch 28/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9104 - loss: 0.3665 - val_accuracy: 0.9527 - val_loss: 0.2781
+Epoch 29/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9136 - loss: 0.3572 - val_accuracy: 0.9449 - val_loss: 0.2861
+Epoch 30/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9152 - loss: 0.3521 - val_accuracy: 0.9496 - val_loss: 0.2830
+Epoch 31/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9143 - loss: 0.3528 - val_accuracy: 0.9552 - val_loss: 0.2733
+Epoch 32/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9171 - loss: 0.3446 - val_accuracy: 0.9362 - val_loss: 0.3040
+Epoch 33/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9136 - loss: 0.3504 - val_accuracy: 0.9426 - val_loss: 0.2957
+Epoch 34/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9178 - loss: 0.3489 - val_accuracy: 0.9489 - val_loss: 0.2749
+Epoch 35/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9077 - loss: 0.3611 - val_accuracy: 0.9528 - val_loss: 0.2666
+Epoch 36/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9149 - loss: 0.3459 - val_accuracy: 0.9546 - val_loss: 0.2731
+Epoch 37/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9155 - loss: 0.3390 - val_accuracy: 0.9541 - val_loss: 0.2583
+Epoch 38/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9160 - loss: 0.3418 - val_accuracy: 0.9528 - val_loss: 0.2716
+Epoch 39/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9079 - loss: 0.3579 - val_accuracy: 0.9500 - val_loss: 0.2694
+Epoch 40/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9184 - loss: 0.3346 - val_accuracy: 0.9381 - val_loss: 0.2998
+Epoch 41/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9201 - loss: 0.3363 - val_accuracy: 0.9358 - val_loss: 0.2894
+Epoch 42/50
+254/254 ━━━━━━━━━━━━━━━━━━━━ 1s 4ms/step - accuracy: 0.9129 - loss: 0.3514 - val_accuracy: 0.9521 - val_loss: 0.2584
+317/317 ━━━━━━━━━━━━━━━━━━━━ 1s 1ms/step  
+
+Accuracy con model.evaluate: 0.9492
